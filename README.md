@@ -34,7 +34,7 @@ This README serves as the living syllabus for the project. Completed projects li
 
 | Phase | Project & Focus | Status |
 |---|---|---|
-| Phase 1 — Graphics Foundation | [Project 1: citro3d Fundamentals](#phase-1--project-1--citro3d-fundamentals) | 🟨 Started |
+| Phase 1 — Graphics Foundation | [Project 1: citro3d Fundamentals](#phase-1--project-1--citro3d-fundamentals) | 🟩 Completed 03/19/2026 |
 | Phase 2 — PS2 Fluency | [Project 2: PS2 Pipeline Study + P3 Asset Extraction](#phase-2--project-2--ps2-pipeline-study--persona-3-asset-extraction) | 🔲 Not started |
 | Phase 3 — Dry Run Port | [Project 3: Port a Small PS2 Homebrew to 3DS](#phase-3--project-3--port-a-small-ps2-homebrew-to-3ds) | 🔲 Not started |
 | Phase 4 — Media Systems | [Project 4: ADX Audio + MVD Video Subsystem](#phase-4--project-4--adx-audio--mvd-video-subsystem) | 🔲 Not started |
@@ -69,7 +69,9 @@ Assuming ~10–15 hours/week average with periodic focused sprints:
 |---|---|
 | Estimated Time | 1–2 focused weekends (8–20 hrs total) |
 | Difficulty | Intermediate |
-| Status | 🟨 Started |
+| Status | 🟩 Completed 03/19/2026 |
+
+### [Project 1 Folder](https://https://github.com/hessef/p3d/tree/main/Project01_citro3d_Fundementals)
 
 ## Overview
 

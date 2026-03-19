@@ -1,4 +1,4 @@
-# Project 1: citro3d Fundementals Report
+# Project 1: citro3d Fundamentals Report
 
 ### Section 1: PICA200 vs. Standard OpenGL
 
@@ -18,13 +18,15 @@ C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
 		GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
 ```
 
-which sets the mode to additive blending, using the alpha from the source. The source in this case is the image texture. If the texture does not have an alpha channel or is completely opaque, like mine is, it is possible to manually set the alpha level and pass that through to the PICA200. That is enough to enforce uniform transparency across an entire texture, but if modulated alpha blending is required, it is necessary to write some additions to the generic picasso assembly code. This assembly code is also called a shader file.
+which sets the mode to standard blending, using the alpha from the source. The source in this case is the image texture. If the texture does not have an alpha channel or is completely opaque, like mine is, it is possible to manually set the alpha level and pass that through to the PICA200. That is enough to enforce uniform transparency across an entire texture, but if modulated alpha blending is required, it is necessary to write some additions to the generic picasso assembly code. This assembly code is also called a shader file.
 
 For this project, I modified the shader file to implement the Fresnel Effect. To do this, the necessary calculations were done and then applied to the alpha channel of the pre-clamped output value. My modifications to the code are shown below:
 
 ```
 ...
 mov r5,		r1	        ; save normalized view-space normal into r5
+...
+mov r3, -r1				; save negated view-space vertex position into r3
 ...
 ; Apply Fresnel effect
 dp3 r4, r3, r3			; squared length
