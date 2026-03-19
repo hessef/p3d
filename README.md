@@ -32,15 +32,15 @@ This README serves as the living syllabus for the project. Completed projects li
 
 ## Project Ladder
 
-| Phase | Project & Focus |
-|---|---|
-| Phase 1 — Graphics Foundation | [Project 1: citro3d Fundamentals](#phase-1--project-1--citro3d-fundamentals) |
-| Phase 2 — PS2 Fluency | [Project 2: PS2 Pipeline Study + P3 Asset Extraction](#phase-2--project-2--ps2-pipeline-study--persona-3-asset-extraction) |
-| Phase 3 — Dry Run Port | [Project 3: Port a Small PS2 Homebrew to 3DS](#phase-3--project-3--port-a-small-ps2-homebrew-to-3ds) |
-| Phase 4 — Media Systems | [Project 4: ADX Audio + MVD Video Subsystem](#phase-4--project-4--adx-audio--mvd-video-subsystem) |
-| Phase 5 — Real Assets | [Project 5: Persona 3 Model/Map Viewer on 3DS](#phase-5--project-5--persona-3-modelmap-viewer-on-3ds) |
-| Phase 6 — Core Gameplay | [Project 6: Persona 3 Combat Prototype on 3DS](#phase-6--project-6--persona-3-combat-prototype-on-3ds) |
-| Capstone | [Persona 3D: Full Port Integration](#capstone-persona-3d) |
+| Phase | Project & Focus | Status |
+|---|---|---|
+| Phase 1 — Graphics Foundation | [Project 1: citro3d Fundamentals](#phase-1--project-1--citro3d-fundamentals) | 🟨 Started |
+| Phase 2 — PS2 Fluency | [Project 2: PS2 Pipeline Study + P3 Asset Extraction](#phase-2--project-2--ps2-pipeline-study--persona-3-asset-extraction) | 🔲 Not started |
+| Phase 3 — Dry Run Port | [Project 3: Port a Small PS2 Homebrew to 3DS](#phase-3--project-3--port-a-small-ps2-homebrew-to-3ds) | 🔲 Not started |
+| Phase 4 — Media Systems | [Project 4: ADX Audio + MVD Video Subsystem](#phase-4--project-4--adx-audio--mvd-video-subsystem) | 🔲 Not started |
+| Phase 5 — Real Assets | [Project 5: Persona 3 Model/Map Viewer on 3DS](#phase-5--project-5--persona-3-modelmap-viewer-on-3ds) | 🔲 Not started |
+| Phase 6 — Core Gameplay | [Project 6: Persona 3 Combat Prototype on 3DS](#phase-6--project-6--persona-3-combat-prototype-on-3ds) | 🔲 Not started |
+| Capstone | [Persona 3D: Full Port Integration](#capstone-persona-3d) | 🔲 Not started |
 
 ---
 
@@ -69,7 +69,7 @@ Assuming ~10–15 hours/week average with periodic focused sprints:
 |---|---|
 | Estimated Time | 1–2 focused weekends (8–20 hrs total) |
 | Difficulty | Intermediate |
-| Status | 🔲 Not started |
+| Status | 🟨 Started |
 
 ## Overview
 
