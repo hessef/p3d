@@ -1,4 +1,4 @@
-**PERSONA 3D**
+#PERSONA 3D
 
 A Self-Directed Course in Console Porting
 
@@ -6,7 +6,7 @@ From Homebrew to Full Port:
 
 **Porting Persona 3 FES to the Nintendo 3DS**
 
-Fritz Hesser · Spring 2025 -- Ongoing
+Fritz Hesse · Spring 2025 -- Ongoing
 
 Self-Directed Independent Study
 
@@ -111,9 +111,9 @@ Assuming \~10--15 hours/week average with periodic focused sprints:
   release               
   --------------------- -------------------------------------------------
 
-Phase 1 · Project 1
+# Phase 1 · Project 1
 
-**citro3d Fundamentals**
+### citro3d Fundamentals
 
 Mastering the 3DS GPU Pipeline
 
