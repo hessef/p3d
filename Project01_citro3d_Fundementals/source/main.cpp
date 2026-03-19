@@ -201,13 +201,21 @@ static int sceneInit(void)
 	C3D_TexSetFilter(&grid_tex, GPU_LINEAR, GPU_NEAREST);
 	C3D_TexBind(0, &grid_tex);
 
-	// Configure the first fragment shading substage to blend the texture color with
-	// the vertex color (calculated by the vertex shader using a lighting algorithm)
-	// See https://www.opengl.org/sdk/docs/man2/xhtml/glTexEnv.xml for more insight
+	//global render state — set once, affects all draw calls
+	C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
+		GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
+		GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
+
+	//set up rendering environment
 	C3D_TexEnv* env = C3D_GetTexEnv(0);
 	C3D_TexEnvInit(env);
-	C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+	C3D_TexEnvColor(env, 0xFFFFFF80); //set 50% transparency
+
+	//set RGB and Alpha sources and functions separately
+	C3D_TexEnvSrc(env, C3D_RGB, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+	C3D_TexEnvSrc(env, C3D_Alpha, GPU_CONSTANT, GPU_CONSTANT, GPU_CONSTANT);
 	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+	C3D_TexEnvFunc(env, C3D_Alpha, GPU_REPLACE);
 
 	return vertex_count;
 }
