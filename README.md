@@ -71,7 +71,7 @@ Assuming ~10–15 hours/week average with periodic focused sprints:
 | Difficulty | Intermediate |
 | Status | 🟩 Completed 03/19/2026 |
 
-### [Project 1 Folder](https://github.com/hessef/p3d/tree/main/Project01_citro3d_Fundamentals)
+### [Project 1 Folder](Project01_citro3d_Fundamentals) 
 
 ## Overview
 
