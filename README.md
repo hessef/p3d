@@ -69,7 +69,7 @@ Assuming ~10–15 hours/week average with periodic focused sprints:
 |---|---|
 | Estimated Time | 1–2 focused weekends (8–20 hrs total) |
 | Difficulty | Intermediate |
-| Status | 🔲 Not started |
+| Status | 🟩 Started |
 
 ## Overview
 
