@@ -1,0 +1,23 @@
+# Notes for future reference
+
+---
+
+---
+
+### 1. Heap-allocated memory for the load_obj function
+
+Heap-allocation allows for the memory to be dynamically allocated during runtime rather than defined at compilation, which is important because the compiler doesn't know the actual number of vertices the .obj file will produce, so that needs to be accounted for at runtime. Additionally, the reason free() must be called when it is done is because it is heap-allocated, and therefore if the memory space is no longer needed it needs to be manually cleared to allow other functions/scripts/whatever within the application to use that space in the heap. Unlike higher-level languages (higher-level in this context means that they are more abstracted from the hardware, not that they are superior) like Python or Java, C and C++ do not have a garbage collector that handles clearing the heap automatically. Basically, clearing the heap with free() prevents a memory leak, which is especially important on the 3DS, which only has 128MB of FCRAM (Fast Compact RAM), and while the New 3DS does double that amount to 256 MB, it is still a comparatively tiny amount in the modern age (not to mention that some of that total FCRAM [about 64MB] is reserved for the OS). Also, the reason why vertex_list needs to be cleared at all is because it's just a staging buffer to load and process the .obj file, and the buffer where the model actually exists for use is vbo_data, which needs to remain uncleared for as long as the GPU is drawing from it.
+
+---
+
+### 2. Wavefront .obj data structure
+
+.obj files separate each face into lists of vertex positions, texture coordinates (UV), and normals. But unlike GPU APIs like OpenGL and Vulkan, which utilize unified index buffers, the indices of each list in a .obj file are not guaranteed to match. So, while the position data for a vertex might be index 2, its normals may be index 4 and its UV might be index 9. Thus, in order to properly package the information for a model stored in a .obj file, it is necessary to loop through each vertex and manually set attributes in a struct.
+
+Additionally, .obj files' coordinate system has the origin at the bottom left, with the vertical axis extending upwards. That means V=0, or the horizontal axis, is at the bottom instead of the top like citro3d (and most other GPU APIs) expect it to be. Thus it is necessary to flip the vertical component of texture coordinates when loading a model from a .obj file so that the origin is at the top and the vertical axis extends downward.
+
+---
+
+### 3. Texture sizing
+
+When using an image texture with a UV-unwrapped model, the texture must be a square and must have side lengths that are a power of two. 64x64, 128x128, 256x256, and 512x512, are some examples of resolutions that would work. When a texture's dimensions are **not** a power of two, it will be offset when rendered on faces, and parts of the UV mesh that are close to the edge of the canvas may simply not be rendered at all, resulting in the appearance of gaps between adjacent faces on the rendered model.

@@ -6,7 +6,7 @@
 #include <tex3ds.h>
 #include <string.h>
 #include "vshader_shbin.h"
-#include "kitten_t3x.h"
+#include "grid_t3x.h"		//image texture needs to be a square and power of two, like 64x64 or 128x128
 
 //for tiny obj loader
 #include <string>
@@ -23,74 +23,99 @@
 	GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8) | \
 	GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO))
 
-//keep this as-is from the example
-typedef struct { float position[3]; float texcoord[2]; float normal[3]; } vertex;
+#define OBJ_PATH "romfs:/T-Block.obj"
 
-//returns heap-allocated vertex array in place of hard-coded array from example
-static const vertex vertex_list[] =
+typedef struct { float position[3]; float texcoord[2]; float normal[3]; } vertex;	//keep this as-is from the example
+
+/*
+Loads a .obj file and returns a flat array of vertices ready for citro3d
+
+citro3d needs an array with the vertices of every triangle, even ones that
+might be considered 'duplicates' because multiple triangles have a vertex
+at that point. 
+
+Parameters:
+	path		- romfs path to the .obj file, like this: "romfs:/cube.obj"
+	out_count	- pointer to a variable that stores the number of vertices
+
+Returns:
+	heap-allocated array of vertex structs or nullptr if loading failed (notes 1)
+
+*/
+vertex* load_obj(const char* path, int* out_count)
 {
-	// First face (PZ)
-	// First triangle
-	{ {-0.5f, -0.5f, +0.5f}, {0.0f, 0.0f}, {0.0f, 0.0f, +1.0f} },
-	{ {+0.5f, -0.5f, +0.5f}, {1.0f, 0.0f}, {0.0f, 0.0f, +1.0f} },
-	{ {+0.5f, +0.5f, +0.5f}, {1.0f, 1.0f}, {0.0f, 0.0f, +1.0f} },
-	// Second triangle
-	{ {+0.5f, +0.5f, +0.5f}, {1.0f, 1.0f}, {0.0f, 0.0f, +1.0f} },
-	{ {-0.5f, +0.5f, +0.5f}, {0.0f, 1.0f}, {0.0f, 0.0f, +1.0f} },
-	{ {-0.5f, -0.5f, +0.5f}, {0.0f, 0.0f}, {0.0f, 0.0f, +1.0f} },
+	//tiny_obj_loader output containers
+	//these 4 lines are generally always going to exist like this
+	tinyobj::attrib_t attrib;						//holds positions, UVs, and normals
+    std::vector<tinyobj::shape_t> shapes;			//holds the meshes
+    std::vector<tinyobj::material_t> materials;		//holds materials (unused here)
+    std::string err;								//receives any errors from the loader
 
-	// Second face (MZ)
-	// First triangle
-	{ {-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f} },
-	{ {-0.5f, +0.5f, -0.5f}, {1.0f, 0.0f}, {0.0f, 0.0f, -1.0f} },
-	{ {+0.5f, +0.5f, -0.5f}, {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f} },
-	// Second triangle
-	{ {+0.5f, +0.5f, -0.5f}, {1.0f, 1.0f}, {0.0f, 0.0f, -1.0f} },
-	{ {+0.5f, -0.5f, -0.5f}, {0.0f, 1.0f}, {0.0f, 0.0f, -1.0f} },
-	{ {-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {0.0f, 0.0f, -1.0f} },
+	//load the .obj file and fill the containers defined above
+	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path)) {
+		*out_count = 0;
+		return nullptr;
+	}
 
-	// Third face (PX)
-	// First triangle
-	{ {+0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {+1.0f, 0.0f, 0.0f} },
-	{ {+0.5f, +0.5f, -0.5f}, {1.0f, 0.0f}, {+1.0f, 0.0f, 0.0f} },
-	{ {+0.5f, +0.5f, +0.5f}, {1.0f, 1.0f}, {+1.0f, 0.0f, 0.0f} },
-	// Second triangle
-	{ {+0.5f, +0.5f, +0.5f}, {1.0f, 1.0f}, {+1.0f, 0.0f, 0.0f} },
-	{ {+0.5f, -0.5f, +0.5f}, {0.0f, 1.0f}, {+1.0f, 0.0f, 0.0f} },
-	{ {+0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {+1.0f, 0.0f, 0.0f} },
+	//count the number of indices, including duplicates, within each shape in the file
+	int tot = 0;
+	for (const auto& shape : shapes)		//equivalent to "for shape in shapes" in Python
+		tot += shape.mesh.indices.size();
 
-	// Fourth face (MX)
-	// First triangle
-	{ {-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f} },
-	{ {-0.5f, -0.5f, +0.5f}, {1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f} },
-	{ {-0.5f, +0.5f, +0.5f}, {1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f} },
-	// Second triangle
-	{ {-0.5f, +0.5f, +0.5f}, {1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f} },
-	{ {-0.5f, +0.5f, -0.5f}, {0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f} },
-	{ {-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f} },
+	//allocate the flat vertex array on the heap
+	//the caller will need to free() it later
+	vertex* verts = (vertex*)malloc(sizeof(vertex) * tot);
+	int verts_index = 0;	//tracks which output vertex index is being filled
 
-	// Fifth face (PY)
-	// First triangle
-	{ {-0.5f, +0.5f, -0.5f}, {0.0f, 0.0f}, {0.0f, +1.0f, 0.0f} },
-	{ {-0.5f, +0.5f, +0.5f}, {1.0f, 0.0f}, {0.0f, +1.0f, 0.0f} },
-	{ {+0.5f, +0.5f, +0.5f}, {1.0f, 1.0f}, {0.0f, +1.0f, 0.0f} },
-	// Second triangle
-	{ {+0.5f, +0.5f, +0.5f}, {1.0f, 1.0f}, {0.0f, +1.0f, 0.0f} },
-	{ {+0.5f, +0.5f, -0.5f}, {0.0f, 1.0f}, {0.0f, +1.0f, 0.0f} },
-	{ {-0.5f, +0.5f, -0.5f}, {0.0f, 0.0f}, {0.0f, +1.0f, 0.0f} },
+	//loop over every shape in the file
+	for (const auto& shape : shapes) {
 
-	// Sixth face (MY)
-	// First triangle
-	{ {-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {0.0f, -1.0f, 0.0f} },
-	{ {+0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}, {0.0f, -1.0f, 0.0f} },
-	{ {+0.5f, -0.5f, +0.5f}, {1.0f, 1.0f}, {0.0f, -1.0f, 0.0f} },
-	// Second triangle
-	{ {+0.5f, -0.5f, +0.5f}, {1.0f, 1.0f}, {0.0f, -1.0f, 0.0f} },
-	{ {-0.5f, -0.5f, +0.5f}, {0.0f, 1.0f}, {0.0f, -1.0f, 0.0f} },
-	{ {-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}, {0.0f, -1.0f, 0.0f} },
-};
+		//loop over every index in the shape's mesh and link the data (notes 2)
+		//mesh.indices allows us to iterate over each vertex and skip over
+		//the grouping by face
+		for (const auto& index : shape.mesh.indices) {
 
-#define vertex_list_count (sizeof(vertex_list)/sizeof(vertex_list[0]))
+			// --- POSITION ---
+			//vertex positions are stored in a flat float array: [x0, y0, z0, x1, y1, z1, ...]
+			//so vertex V starts at index V*3
+			verts[verts_index].position[0] = attrib.vertices[3 * index.vertex_index + 0]; // X
+            verts[verts_index].position[1] = attrib.vertices[3 * index.vertex_index + 1]; // Y
+            verts[verts_index].position[2] = attrib.vertices[3 * index.vertex_index + 2]; // Z
+
+			// --- TEXTURE COORDINATES ---
+			//texture coordinates are stored in a flat float array: [u0, v0, u1, v1, ...]
+            //so texture coordinate C starts at index C*2
+			if (index.texcoord_index >= 0) {
+                verts[verts_index].texcoord[0] =        attrib.texcoords[2 * index.texcoord_index + 0];	// U
+                verts[verts_index].texcoord[1] = 1.0f - attrib.texcoords[2 * index.texcoord_index + 1];	// V (flipped)
+				//see notes 2 for details on why flipping is needed
+            } else {
+                //if the texcoord_index is -1, there is no UV so we default to (0,0)
+                verts[verts_index].texcoord[0] = 0.0f;
+                verts[verts_index].texcoord[1] = 0.0f;
+            }
+
+			// --- NORMALS ---
+			//normals are stores in a flat float array: [nx0, ny0, nz0, nx1, ny1, nz1, ...]
+			//so normal N starts at index N*3
+			if (index.normal_index >= 0) {
+                verts[verts_index].normal[0] = attrib.normals[3 * index.normal_index + 0]; // NX
+                verts[verts_index].normal[1] = attrib.normals[3 * index.normal_index + 1]; // NY
+                verts[verts_index].normal[2] = attrib.normals[3 * index.normal_index + 2]; // NZ
+            } else {
+                //if the normal_index is -1, there are no normals so we default to (0,0,1)
+                verts[verts_index].normal[0] = 0.0f;
+                verts[verts_index].normal[1] = 0.0f;
+                verts[verts_index].normal[2] = 1.0f;
+            }
+
+			verts_index++; //move to the next vertex index
+		}
+	}
+
+	*out_count = tot;	//set variable out_count to the number of vertices
+	return verts;
+}
 
 static DVLB_s* vshader_dvlb;
 static shaderProgram_s program;
@@ -108,7 +133,7 @@ static C3D_Mtx material =
 };
 
 static void* vbo_data;
-static C3D_Tex kitten_tex;
+static C3D_Tex grid_tex;
 static float angleX = 0.0, angleY = 0.0;
 
 // Helper function for loading a texture from memory
@@ -123,7 +148,12 @@ static bool loadTextureFromMem(C3D_Tex* tex, C3D_TexCube* cube, const void* data
 	return true;
 }
 
-static void sceneInit(void)
+/*
+Changes compared to sample:
+	- Now loads an object from .obj file instead of using hard-coded vertices
+	- now returns vertex_count (number of vertices)
+*/
+static int sceneInit(void)
 {
 	// Load the vertex shader, create a shader program and bind it
 	vshader_dvlb = DVLB_ParseFile((u32*)vshader_shbin, vshader_shbin_size);
@@ -149,9 +179,16 @@ static void sceneInit(void)
 	// Compute the projection matrix
 	Mtx_PerspTilt(&projection, C3D_AngleFromDegrees(80.0f), C3D_AspectRatioTop, 0.01f, 1000.0f, false);
 
+	//create vertex_list and calculate size
+	int vertex_count = 0;
+	vertex* vertex_list = load_obj(OBJ_PATH, &vertex_count);
+
 	// Create the VBO (vertex buffer object)
-	vbo_data = linearAlloc(sizeof(vertex_list));
-	memcpy(vbo_data, vertex_list, sizeof(vertex_list));
+	vbo_data = linearAlloc(sizeof(vertex) * vertex_count);			//use sizeof the struct vertex
+	memcpy(vbo_data, vertex_list, sizeof(vertex) * vertex_count);
+
+	//now free the vertex list from the heap (notes 1)
+	free(vertex_list);
 
 	// Configure buffers
 	C3D_BufInfo* bufInfo = C3D_GetBufInfo();
@@ -159,10 +196,10 @@ static void sceneInit(void)
 	BufInfo_Add(bufInfo, vbo_data, sizeof(vertex), 3, 0x210);
 
 	// Load the texture and bind it to the first texture unit
-	if (!loadTextureFromMem(&kitten_tex, NULL, kitten_t3x, kitten_t3x_size))
+	if (!loadTextureFromMem(&grid_tex, NULL, grid_t3x, grid_t3x_size))
 		svcBreak(USERBREAK_PANIC);
-	C3D_TexSetFilter(&kitten_tex, GPU_LINEAR, GPU_NEAREST);
-	C3D_TexBind(0, &kitten_tex);
+	C3D_TexSetFilter(&grid_tex, GPU_LINEAR, GPU_NEAREST);
+	C3D_TexBind(0, &grid_tex);
 
 	// Configure the first fragment shading substage to blend the texture color with
 	// the vertex color (calculated by the vertex shader using a lighting algorithm)
@@ -171,9 +208,15 @@ static void sceneInit(void)
 	C3D_TexEnvInit(env);
 	C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
 	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+
+	return vertex_count;
 }
 
-static void sceneRender(void)
+/*
+Changes compared to sample:
+	- Now takes vertex_count (number of vertices) as an argument
+*/
+static void sceneRender(int vertex_count)
 {
 	// Calculate the modelView matrix
 	C3D_Mtx modelView;
@@ -195,13 +238,13 @@ static void sceneRender(void)
 	C3D_FVUnifSet(GPU_VERTEX_SHADER, uLoc_lightClr,     1.0f, 1.0f,  1.0f, 1.0f);
 
 	// Draw the VBO
-	C3D_DrawArrays(GPU_TRIANGLES, 0, vertex_list_count);
+	C3D_DrawArrays(GPU_TRIANGLES, 0, vertex_count);
 }
 
 static void sceneExit(void)
 {
 	// Free the texture
-	C3D_TexDelete(&kitten_tex);
+	C3D_TexDelete(&grid_tex);
 
 	// Free the VBO
 	linearFree(vbo_data);
@@ -217,12 +260,15 @@ int main()
 	gfxInitDefault();
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 
+	//initialize romfs
+	romfsInit();
+
 	// Initialize the render target
 	C3D_RenderTarget* target = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 	C3D_RenderTargetSetOutput(target, GFX_TOP, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
 
 	// Initialize the scene
-	sceneInit();
+	int vertex_count = sceneInit();
 
 	// Main loop
 	while (aptMainLoop())
@@ -238,12 +284,15 @@ int main()
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 			C3D_RenderTargetClear(target, C3D_CLEAR_ALL, CLEAR_COLOR, 0);
 			C3D_FrameDrawOn(target);
-			sceneRender();
+			sceneRender(vertex_count);
 		C3D_FrameEnd(0);
 	}
 
 	// Deinitialize the scene
 	sceneExit();
+
+	// Deinitialize romfs
+	romfsExit();
 
 	// Deinitialize graphics
 	C3D_Fini();
