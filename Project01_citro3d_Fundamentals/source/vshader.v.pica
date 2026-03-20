@@ -1,4 +1,4 @@
-; Example PICA200 vertex shader
+; PICA200 vertex shader with Fresnel effect
 
 ; Uniforms
 .fvec projection[4], modelView[4]
