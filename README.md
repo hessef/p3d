@@ -197,6 +197,7 @@ By the end of this project you will be able to:
 - [PersonaEditor](https://github.com/Secre-C/PersonaEditor)
 - [GFD-Studio](https://github.com/tge-was-taken/GFD-Studio)
 - [Atlus Modding Discord](https://discord.gg/naoto)
+- [Amicitia Wiki](https://amicitia.miraheze.org/wiki/Persona_3)
 
 **Game Logic Reference**
 - [Persona 3 Portable PC port (Steam)](https://store.steampowered.com/app/1557840/) — use Ghidra or x64dbg to read Windows binary for combat formulas, calendar logic, and other shared systems. Cross-reference against PCSX2 for any behavior that may differ between Portable and FES.
@@ -633,6 +634,7 @@ To avoid legal issues, the port is distributed as a build system and patch tool 
 - [PersonaEditor](https://github.com/Secre-C/PersonaEditor)
 - [VGMStream (ADX audio)](https://github.com/vgmstream/vgmstream)
 - [Atlus Modding Discord](https://discord.gg/naoto)
+- [Amicitia Wiki](https://amicitia.miraheze.org/wiki/Persona_3)
 
 ## Game Logic Reference
 - [Persona 3 Portable PC port (Steam)](https://store.steampowered.com/app/1557840/)

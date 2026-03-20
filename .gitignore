@@ -1,3 +1,5 @@
 **/tasks.json
 *.iso
 /P3Assets/
+/CommunityTools/
+/ExtractedFiles/
